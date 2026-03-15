@@ -17,44 +17,14 @@ struct ExpectedFileHash
 
 ExpectedFileHash files[] = { {"content1.dat", "3C1BD5AC79353515478E8EF446B2DB2895F31A09EBACA2D056DA9C2AD2E066A6"} };
 
-void HashComparer::Start()
+void HashComparer::threadedWork()
 {
-    m_hStopEvent = CreateEvent(NULL, TRUE, FALSE, NULL);
-    m_hThread = (HANDLE)_beginthreadex(NULL, 0, &StaticThreadStart, this, 0, &m_ThreadId);
+    compareHashes();
 }
 
-void HashComparer::Stop()
+int HashComparer::getCheckInterval()
 {
-    if (m_hStopEvent != INVALID_HANDLE_VALUE)
-    {
-        SetEvent(m_hStopEvent);
-    }
-
-    if (m_hThread != INVALID_HANDLE_VALUE)
-    {
-        WaitForSingleObject(m_hThread, INFINITE);
-
-    }
-
-    CloseHandle(m_hThread);
-    m_hThread = INVALID_HANDLE_VALUE;
-
-    CloseHandle(m_hStopEvent);
-    m_hStopEvent = INVALID_HANDLE_VALUE;
-}
-
-unsigned __stdcall HashComparer::StaticThreadStart(void* args)
-{
-    HashComparer* pThis = static_cast<HashComparer*>(args);
-    if (nullptr != pThis)
-    {
-        while (WaitForSingleObject(pThis->m_hStopEvent, 1) == WAIT_TIMEOUT) // Check to see if we've been signaled to stop.  If not, we'll timeout on the wait, otherwise we'll get a success code
-        {
-            pThis->compareHashes();
-            Sleep(CHECK_INTERVAL_MS);
-        }
-    }
-    return 0;
+    return CHECK_INTERVAL_MS;
 }
 
 // these functions will have significantly different implementations in kernel mode, so they are defined in this project specific user-mode file
