@@ -1,9 +1,12 @@
 #include <stdio.h>
-#include "AttackDetector.h"
-#include "HashComparison.h"
 #include <string>
 #include <iostream>
 #include <vector>
+
+
+#include "AttackDetector.h"
+#include "HashComparison.h"
+#include "ProcessScanner.h"
 
 const char* secretString = "This is a string";
 
@@ -15,6 +18,7 @@ int main(int argc, char* argv[])
     std::vector<AttackDetector*> attackDetectors;
 
     attackDetectors.push_back(new HashComparer());
+    attackDetectors.push_back(new ProcessScanner());
 
     for (AttackDetector* detector : attackDetectors)
     {
@@ -31,8 +35,6 @@ int main(int argc, char* argv[])
         }
     }
 
-    std::cout << "Application exiting gracefully" << std::endl;
-
     for (auto curr = attackDetectors.begin(); curr != attackDetectors.end(); ++curr)
     {
         // grab the current pointer out of the iterator
@@ -44,4 +46,6 @@ int main(int argc, char* argv[])
     }
     // this leaves a freed pointers in the vector, it's no longer safe to interact with any elements, so clear them all
     attackDetectors.clear();
+
+    std::cout << "Application exiting gracefully" << std::endl;
 }
