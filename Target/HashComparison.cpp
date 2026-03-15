@@ -2,6 +2,7 @@
 
 #include <bcrypt.h>
 #include <process.h>
+#include <iostream>
 
 #define NT_SUCCESS(Status)          (((NTSTATUS)(Status)) >= 0)
 
@@ -25,6 +26,16 @@ HashComparer::HashComparer()
 void HashComparer::threadedWork()
 {
     compareHashes();
+}
+
+void HashComparer::printStartMessage()
+{
+    std::cout << "HashComparer checking validity of file contents" << std::endl;
+}
+
+void HashComparer::printStopMessage()
+{
+    std::cout << "HashComparer shutting down" << std::endl;
 }
 
 // these functions will have significantly different implementations in kernel mode, so they are defined in this project specific user-mode file
@@ -109,7 +120,7 @@ void HashComparer::compareHashes()
         if (compare_result != 0)
         {
             // there was an attack, exit
-            exit(111);
+            exit(0xFE11);
         }
     }
 }
