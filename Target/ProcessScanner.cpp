@@ -13,12 +13,12 @@ ProcessScanner::ProcessScanner()
 
 void ProcessScanner::printStartMessage()
 {
-	std::cout << "ProcessScanner is on the case, watching for attackers" << std::endl;
+	std::cout << "ProcessScanner is on the case, watching for attackers\r\n";
 }
 
 void ProcessScanner::printStopMessage()
 {
-	std::cout << "ProcessScanner is shutting down, you're on your own against the bad guys" << std::endl;
+	std::cout << "ProcessScanner is shutting down, you're on your own against the bad guys\r\n";
 }
 
 void ProcessScanner::threadedWork()
@@ -31,14 +31,14 @@ void ProcessScanner::threadedWork()
 	hProcessSnapshot = CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 0);
 	if (hProcessSnapshot == INVALID_HANDLE_VALUE)
 	{
-		std::cout << "Couldn't create process snapshot, try again after wait_interval" << std::endl;
+		std::cout << "Couldn't create process snapshot, try again after wait_interval\r\n";
 		return;
 	}
 
 	// iterate over the found processes, looking for matches against our list of suspects
 	if (!Process32First(hProcessSnapshot, &pe32))
 	{
-		std::cout << "Couldn't get first process, try again" << std::endl;
+		std::cout << "Couldn't get first process, try again\r\n";
 		CloseHandle(hProcessSnapshot);
 		return;
 	}

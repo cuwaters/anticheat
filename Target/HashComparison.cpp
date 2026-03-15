@@ -30,12 +30,12 @@ void HashComparer::threadedWork()
 
 void HashComparer::printStartMessage()
 {
-    std::cout << "HashComparer checking validity of file contents" << std::endl;
+    std::cout << "HashComparer checking validity of file contents\r\n";
 }
 
 void HashComparer::printStopMessage()
 {
-    std::cout << "HashComparer shutting down" << std::endl;
+    std::cout << "HashComparer shutting down\r\n";
 }
 
 // these functions will have significantly different implementations in kernel mode, so they are defined in this project specific user-mode file
