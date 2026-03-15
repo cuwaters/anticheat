@@ -35,13 +35,16 @@ void AttackDetector::Stop()
 unsigned __stdcall AttackDetector::StaticThreadStart(void* args)
 {
     AttackDetector* pThis = static_cast<AttackDetector*>(args);
+
     if (nullptr != pThis)
     {
+        pThis->printStartMessage();
         while (WaitForSingleObject(pThis->m_hStopEvent, 1) == WAIT_TIMEOUT) // Check to see if we've been signaled to stop.  If not, we'll timeout on the wait, otherwise we'll get a success code
         {
             pThis->threadedWork();
             Sleep(pThis->m_CheckInterval);
         }
+        pThis->printStopMessage();
     }
     return 0;
 }

@@ -11,6 +11,9 @@ protected:
 	static unsigned __stdcall StaticThreadStart(void* args);
 	virtual void threadedWork() = 0;
 
+	virtual void printStartMessage() = 0;
+	virtual void printStopMessage() = 0;
+
 	HANDLE m_hThread = INVALID_HANDLE_VALUE;
 	HANDLE m_hStopEvent = INVALID_HANDLE_VALUE;
 	unsigned int m_ThreadId = 0;
