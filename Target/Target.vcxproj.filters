@@ -24,12 +24,18 @@
     <ClCompile Include="HashComparison.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="ProcessScanner.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="AttackDetector.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="HashComparison.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ProcessScanner.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
