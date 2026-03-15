@@ -1,56 +1,31 @@
-// Target.cpp : This file contains the 'main' function. Program execution begins and ends there.
-//
-
 #include <stdio.h>
 #include "HashComparison.h"
+#include <string>
+#include <iostream>
 
 const char* secretString = "This is a string";
 
 int main(int argc, char* argv[])
 {
-    printf("Hello World! \n");
-    printf("%s\n", secretString);
+    std::string input;
+    std::cout << "Game is running.  Enter 'q' or 'Q' to exit." << std::endl;
 
-    compareHashes();
-}
+    HashComparer* hasher = new HashComparer();
+    hasher->Start();
 
-// these functions will have significantly different implementations in kernel mode, so they are defined in this project specific user-mode file
-
-DWORD getTargetDirectory(char* buffer, DWORD bufferSize)
-{    
-    DWORD pathLength = GetCurrentDirectoryA(bufferSize, buffer);
-    buffer[pathLength++] = '\\';
-
-    return pathLength;
-}
-
-int readContentFile(const char* filename, BYTE** ppBytes, DWORD* pFileSize)
-{
-    HANDLE hFile = CreateFileA(filename, GENERIC_READ, FILE_SHARE_READ, NULL, OPEN_EXISTING, 0, NULL);
-    if (INVALID_HANDLE_VALUE == hFile)
+    while (true)
     {
-        return 1;
+        // keep the 'game' running
+        std::getline(std::cin, input);
+        if (input == "q" || input == "Q")
+        {
+            break;
+        }
     }
 
-    LARGE_INTEGER size;
-    size.QuadPart = 0;
-    if (!GetFileSizeEx(hFile, &size))
-    {
-        CloseHandle(hFile);
-        return 2;
-    }
+    std::cout << "Application exiting gracefully" << std::endl;
 
-    *pFileSize = size.LowPart;
-
-    *ppBytes = (BYTE*)HeapAlloc(GetProcessHeap(), 0, *pFileSize);
-    DWORD bytesRead = 0;
-    if (!ReadFile(hFile, *ppBytes, *pFileSize, &bytesRead, NULL))
-    {
-        CloseHandle(hFile);
-        return 3;
-    }
-
-    CloseHandle(hFile);
-
-    return 0;
+    hasher->Stop();
+    delete hasher;
+    hasher = nullptr;
 }

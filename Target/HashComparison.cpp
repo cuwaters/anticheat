@@ -1,10 +1,13 @@
 #include "HashComparison.h"
 
 #include <bcrypt.h>
+#include <process.h>
 
 #define NT_SUCCESS(Status)          (((NTSTATUS)(Status)) >= 0)
 
 #define STATUS_UNSUCCESSFUL         ((NTSTATUS)0xC0000001L)
+
+#define CHECK_INTERVAL_MS           2500
 
 struct ExpectedFileHash
 {
@@ -14,7 +17,87 @@ struct ExpectedFileHash
 
 ExpectedFileHash files[] = { {"content1.dat", "3C1BD5AC79353515478E8EF446B2DB2895F31A09EBACA2D056DA9C2AD2E066A6"} };
 
-void compareHashes()
+void HashComparer::Start()
+{
+    m_hStopEvent = CreateEvent(NULL, TRUE, FALSE, NULL);
+    m_hThread = (HANDLE)_beginthreadex(NULL, 0, &StaticThreadStart, this, 0, &m_ThreadId);
+}
+
+void HashComparer::Stop()
+{
+    if (m_hStopEvent != INVALID_HANDLE_VALUE)
+    {
+        SetEvent(m_hStopEvent);
+    }
+
+    if (m_hThread != INVALID_HANDLE_VALUE)
+    {
+        WaitForSingleObject(m_hThread, INFINITE);
+
+    }
+
+    CloseHandle(m_hThread);
+    m_hThread = INVALID_HANDLE_VALUE;
+
+    CloseHandle(m_hStopEvent);
+    m_hStopEvent = INVALID_HANDLE_VALUE;
+}
+
+unsigned __stdcall HashComparer::StaticThreadStart(void* args)
+{
+    HashComparer* pThis = static_cast<HashComparer*>(args);
+    if (nullptr != pThis)
+    {
+        while (WaitForSingleObject(pThis->m_hStopEvent, 1) == WAIT_TIMEOUT) // Check to see if we've been signaled to stop.  If not, we'll timeout on the wait, otherwise we'll get a success code
+        {
+            pThis->compareHashes();
+            Sleep(CHECK_INTERVAL_MS);
+        }
+    }
+    return 0;
+}
+
+// these functions will have significantly different implementations in kernel mode, so they are defined in this project specific user-mode file
+DWORD HashComparer::getTargetDirectory(char* buffer, DWORD bufferSize)
+{
+    DWORD pathLength = GetCurrentDirectoryA(bufferSize, buffer);
+    buffer[pathLength++] = '\\';
+
+    return pathLength;
+}
+
+int HashComparer::readContentFile(const char* filename, BYTE** ppBytes, DWORD* pFileSize)
+{
+    HANDLE hFile = CreateFileA(filename, GENERIC_READ, FILE_SHARE_READ, NULL, OPEN_EXISTING, 0, NULL);
+    if (INVALID_HANDLE_VALUE == hFile)
+    {
+        return 1;
+    }
+
+    LARGE_INTEGER size;
+    size.QuadPart = 0;
+    if (!GetFileSizeEx(hFile, &size))
+    {
+        CloseHandle(hFile);
+        return 2;
+    }
+
+    *pFileSize = size.LowPart;
+
+    *ppBytes = (BYTE*)HeapAlloc(GetProcessHeap(), 0, *pFileSize);
+    DWORD bytesRead = 0;
+    if (!ReadFile(hFile, *ppBytes, *pFileSize, &bytesRead, NULL))
+    {
+        CloseHandle(hFile);
+        return 3;
+    }
+
+    CloseHandle(hFile);
+
+    return 0;
+}
+
+void HashComparer::compareHashes()
 {
     char path[MAX_PATH] = { 0 };
     DWORD dirLength = getTargetDirectory(path, MAX_PATH);
@@ -33,7 +116,7 @@ void compareHashes()
 
         int res = readContentFile(path, &pFileBytes, &fileSize);
 
-        // if we couldn't read the file, skip this file (that's likely an attack, though
+        // if we couldn't read the file, skip this file (that's likely an attack, though)
         if (res != 0)
         {
             continue;
@@ -61,7 +144,7 @@ void compareHashes()
     }
 }
 
-void bytesToHexString(BYTE* bytes, DWORD dwSize, char* hashString)
+void HashComparer::bytesToHexString(BYTE* bytes, DWORD dwSize, char* hashString)
 {
     const char hex_str[] = "0123456789ABCDEF";
 
@@ -79,7 +162,7 @@ void bytesToHexString(BYTE* bytes, DWORD dwSize, char* hashString)
 /// <param name="dataToHash">The input data to hash</param>
 /// <param name="dataSize">the size of the input data</param>
 /// <returns>The size of the buffer holding the output hash</returns>
-DWORD hashDataBuffer(BYTE** ppHashResult, BYTE* dataToHash, DWORD dataSize)
+DWORD HashComparer::hashDataBuffer(BYTE** ppHashResult, BYTE* dataToHash, DWORD dataSize)
 {
     BCRYPT_ALG_HANDLE hAlg = 0;
     BCRYPT_HASH_HANDLE hHash = 0;
