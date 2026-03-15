@@ -1,4 +1,4 @@
-#include "IAttackDetector.h"
+#include "AttackDetector.h"
 #include <process.h>
 
 void AttackDetector::Start()

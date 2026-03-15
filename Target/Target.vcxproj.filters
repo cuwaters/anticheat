@@ -26,7 +26,7 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="IAttackDetector.h">
+    <ClInclude Include="AttackDetector.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="HashComparison.h">

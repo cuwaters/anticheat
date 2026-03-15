@@ -1,7 +1,7 @@
 #pragma once
 
 #include <Windows.h>
-#include "IAttackDetector.h"
+#include "AttackDetector.h"
 
 class HashComparer : public AttackDetector
 {

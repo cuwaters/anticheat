@@ -134,7 +134,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="HashComparison.h" />
-    <ClInclude Include="IAttackDetector.h" />
+    <ClInclude Include="AttackDetector.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <Target Name="CopyFilesToOutput" AfterTargets="Build">

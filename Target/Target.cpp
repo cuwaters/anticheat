@@ -1,5 +1,5 @@
 #include <stdio.h>
-#include "IAttackDetector.h"
+#include "AttackDetector.h"
 #include "HashComparison.h"
 #include <string>
 #include <iostream>
