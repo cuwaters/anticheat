@@ -1,6 +1,11 @@
 #include "AttackDetector.h"
 #include <process.h>
 
+AttackDetector::AttackDetector(int checkInterval)
+    : m_CheckInterval(checkInterval)
+{
+}
+
 void AttackDetector::Start()
 {
     m_hStopEvent = CreateEvent(NULL, TRUE, FALSE, NULL);
@@ -35,7 +40,7 @@ unsigned __stdcall AttackDetector::StaticThreadStart(void* args)
         while (WaitForSingleObject(pThis->m_hStopEvent, 1) == WAIT_TIMEOUT) // Check to see if we've been signaled to stop.  If not, we'll timeout on the wait, otherwise we'll get a success code
         {
             pThis->threadedWork();
-            Sleep(pThis->getCheckInterval());
+            Sleep(pThis->m_CheckInterval);
         }
     }
     return 0;

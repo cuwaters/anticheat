@@ -17,14 +17,14 @@ struct ExpectedFileHash
 
 ExpectedFileHash files[] = { {"content1.dat", "3C1BD5AC79353515478E8EF446B2DB2895F31A09EBACA2D056DA9C2AD2E066A6"} };
 
+HashComparer::HashComparer()
+    : AttackDetector(CHECK_INTERVAL_MS)
+{
+}
+
 void HashComparer::threadedWork()
 {
     compareHashes();
-}
-
-int HashComparer::getCheckInterval()
-{
-    return CHECK_INTERVAL_MS;
 }
 
 // these functions will have significantly different implementations in kernel mode, so they are defined in this project specific user-mode file

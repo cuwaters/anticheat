@@ -5,8 +5,9 @@
 
 class HashComparer : public AttackDetector
 {
+public:
+    HashComparer();
 private:
-    int getCheckInterval() override;
     void threadedWork() override;
     int readContentFile(const char* filename, BYTE** ppBytes, DWORD* pFileSize);
     void bytesToHexString(BYTE* bytes, DWORD dwSize, char* hashString);
