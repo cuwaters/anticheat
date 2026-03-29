@@ -1,5 +1,6 @@
 #include "AttackDetector.h"
 #include <process.h>
+#include <iostream>
 
 AttackDetector::AttackDetector(int checkInterval)
     : m_CheckInterval(checkInterval)
@@ -47,4 +48,12 @@ unsigned __stdcall AttackDetector::StaticThreadStart(void* args)
         pThis->printStopMessage();
     }
     return 0;
+}
+
+void AttackDetector::attackDetected(int attackCode)
+{
+    std::cout << "Attack detected! Code is 0x" << std::hex << std::uppercase << attackCode << "\r\n";
+    std::cout << "Process exiting, you dirty cheater\r\n";
+
+    exit(attackCode);
 }

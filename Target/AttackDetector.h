@@ -14,6 +14,8 @@ protected:
 	virtual void printStartMessage() = 0;
 	virtual void printStopMessage() = 0;
 
+	virtual void attackDetected(int attackCode);
+
 	HANDLE m_hThread = INVALID_HANDLE_VALUE;
 	HANDLE m_hStopEvent = INVALID_HANDLE_VALUE;
 	unsigned int m_ThreadId = 0;

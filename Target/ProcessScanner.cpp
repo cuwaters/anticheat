@@ -50,7 +50,7 @@ void ProcessScanner::threadedWork()
 			if (_wcsicmp(susProcess, pe32.szExeFile) == 0)
 			{
 				// we found an attacker running, exit
-				exit(0xBEEF);
+				attackDetected(0xBEEF);
 			}
 		}
 	} while (Process32Next(hProcessSnapshot, &pe32));

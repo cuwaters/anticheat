@@ -120,7 +120,7 @@ void HashComparer::compareHashes()
         if (compare_result != 0)
         {
             // there was an attack, exit
-            exit(0xFE11);
+            attackDetected(0xFE11);
         }
     }
 }
