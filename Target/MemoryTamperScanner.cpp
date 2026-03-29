@@ -60,7 +60,7 @@ bool MemoryTamperScanner::findSectionByName(const char* name, IMAGE_SECTION_HEAD
 void MemoryTamperScanner::threadedWork()
 {
 	uintptr_t pageRangeStart = m_params.base_address / 0x1000;
-	uintptr_t pageRangeEnd = ((m_params.base_address + m_params.size) + 0xFFFF) / 0x1000;
+	uintptr_t pageRangeEnd = ((m_params.base_address + m_params.size) + 0xFFF) / 0x1000;
 
 	PPSAPI_WORKING_SET_INFORMATION pwsi = nullptr;
 	pwsi = (PPSAPI_WORKING_SET_INFORMATION)malloc(sizeof(PSAPI_WORKING_SET_INFORMATION));
