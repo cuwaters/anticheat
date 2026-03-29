@@ -13,7 +13,8 @@ private:
     void printStartMessage() override;
     void printStopMessage() override;
 
-    bool findTextSection(IMAGE_SECTION_HEADER* sectionHeader);
+	// performs a case-sensitive section name search
+    bool findSectionByName(const char* name, IMAGE_SECTION_HEADER* sectionHeader);
 
 	struct ThreadParams
 	{

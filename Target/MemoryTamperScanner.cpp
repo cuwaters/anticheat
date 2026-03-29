@@ -8,7 +8,7 @@ MemoryTamperScanner::MemoryTamperScanner()
 	: AttackDetector(CHECK_INTERVAL_MS)
 {
 	IMAGE_SECTION_HEADER textSection = {};
-	bool found = findTextSection(&textSection);
+	bool found = findSectionByName(".text", &textSection);
 
 	// we somehow don't have a text section, so aren't running code, including this code?
 	if (!found)
@@ -21,7 +21,7 @@ MemoryTamperScanner::MemoryTamperScanner()
 	m_params.process = GetCurrentProcess();
 }
 
-bool MemoryTamperScanner::findTextSection(IMAGE_SECTION_HEADER* pSectionHeader)
+bool MemoryTamperScanner::findSectionByName(const char* name, IMAGE_SECTION_HEADER* pSectionHeader)
 {
 	constexpr uint16_t dosMagicValue = ('M' | 'Z' << 8);
 	constexpr uint32_t peMagicValue = ('P' | 'E' << 8);
@@ -42,7 +42,7 @@ bool MemoryTamperScanner::findTextSection(IMAGE_SECTION_HEADER* pSectionHeader)
 					for (int i = 0; i < numSections; ++i)
 					{
 						IMAGE_SECTION_HEADER section = sections[i];
-						if (strcmp((const char*)section.Name, ".text") == 0)
+						if (strcmp((const char*)section.Name, name) == 0)
 						{
 							*pSectionHeader = section;
 							return true;
