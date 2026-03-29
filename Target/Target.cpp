@@ -7,6 +7,7 @@
 #include "AttackDetector.h"
 #include "HashComparison.h"
 #include "ProcessScanner.h"
+#include "MemoryTamperScanner.h"
 
 const char* secretString = "This is a string";
 
@@ -19,6 +20,7 @@ int main(int argc, char* argv[])
 
     attackDetectors.push_back(new HashComparer());
     attackDetectors.push_back(new ProcessScanner());
+    attackDetectors.push_back(new MemoryTamperScanner());
 
     for (AttackDetector* detector : attackDetectors)
     {

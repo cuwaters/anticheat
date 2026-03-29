@@ -131,12 +131,14 @@
   <ItemGroup>
     <ClCompile Include="AttackDetector.cpp" />
     <ClCompile Include="HashComparison.cpp" />
+    <ClCompile Include="MemoryTamperScanner.cpp" />
     <ClCompile Include="ProcessScanner.cpp" />
     <ClCompile Include="Target.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="HashComparison.h" />
     <ClInclude Include="AttackDetector.h" />
+    <ClInclude Include="MemoryTamperScanner.h" />
     <ClInclude Include="ProcessScanner.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
