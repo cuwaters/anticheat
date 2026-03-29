@@ -4,6 +4,7 @@
 #include <Psapi.h>
 
 #define CHECK_INTERVAL_MS           1000
+extern const char secretString[];
 
 MemoryTamperScanner::MemoryTamperScanner()
 	: AttackDetector(CHECK_INTERVAL_MS)
@@ -37,10 +38,10 @@ bool MemoryTamperScanner::findSectionByName(const char* name, IMAGE_SECTION_HEAD
 			{
 				if (ntHeaders->Signature == peMagicValue)
 				{
-					uint32_t numSections = ntHeaders->FileHeader.NumberOfSections;
+					WORD numSections = ntHeaders->FileHeader.NumberOfSections;
 					PIMAGE_SECTION_HEADER sections = (PIMAGE_SECTION_HEADER)((uintptr_t)ntHeaders + sizeof(uint32_t) + sizeof(IMAGE_FILE_HEADER) + ntHeaders->FileHeader.SizeOfOptionalHeader);
 
-					for (int i = 0; i < numSections; ++i)
+					for (WORD i = 0; i < numSections; ++i)
 					{
 						IMAGE_SECTION_HEADER section = sections[i];
 						if (strcmp((const char*)section.Name, name) == 0)
@@ -71,7 +72,7 @@ void MemoryTamperScanner::threadedWork()
 	if (!ret && GetLastError() == ERROR_BAD_LENGTH)
 	{
 		// calculate needed size before we free the too-small object
-		uint32_t objectSize = sizeof(PSAPI_WORKING_SET_BLOCK) * pwsi->NumberOfEntries + sizeof(pwsi->NumberOfEntries);
+		DWORD objectSize = (DWORD)(sizeof(PSAPI_WORKING_SET_BLOCK) * pwsi->NumberOfEntries + sizeof(pwsi->NumberOfEntries));
 		free(pwsi);
 		pwsi = (PPSAPI_WORKING_SET_INFORMATION)malloc(objectSize);
 		if (pwsi == nullptr)

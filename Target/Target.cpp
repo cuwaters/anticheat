@@ -9,18 +9,21 @@
 #include "ProcessScanner.h"
 #include "MemoryTamperScanner.h"
 
-const char* secretString = "This is a string";
+
+const char secretString[] = "This is a string in .text section";
 
 int main(int argc, char* argv[])
 {
     std::string input;
     std::cout << "Game is running.  Enter 'q' or 'Q' to exit." << std::endl;
 
+    std::cout << "this is the string that will be attacked:" << std::endl << secretString << std::endl;
+
     std::vector<AttackDetector*> attackDetectors;
 
     attackDetectors.push_back(new HashComparer());
     attackDetectors.push_back(new ProcessScanner());
-    attackDetectors.push_back(new MemoryTamperScanner());
+    //attackDetectors.push_back(new MemoryTamperScanner()); // too many false positives
 
     for (AttackDetector* detector : attackDetectors)
     {
