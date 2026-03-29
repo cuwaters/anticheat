@@ -1,6 +1,7 @@
 #include "MemoryTamperScanner.h"
 #include <cstdint>
 #include <iostream>
+#include <Psapi.h>
 
 #define CHECK_INTERVAL_MS           1000
 
@@ -58,6 +59,48 @@ bool MemoryTamperScanner::findSectionByName(const char* name, IMAGE_SECTION_HEAD
 
 void MemoryTamperScanner::threadedWork()
 {
+	uintptr_t pageRangeStart = m_params.base_address / 0x1000;
+	uintptr_t pageRangeEnd = ((m_params.base_address + m_params.size) + 0xFFFF) / 0x1000;
+
+	PPSAPI_WORKING_SET_INFORMATION pwsi = nullptr;
+	pwsi = (PPSAPI_WORKING_SET_INFORMATION)malloc(sizeof(PSAPI_WORKING_SET_INFORMATION));
+
+	bool ret = QueryWorkingSet(m_params.process, (PVOID)pwsi, sizeof(PSAPI_WORKING_SET_INFORMATION));
+
+	// do we need to allocate more space for pwsi?
+	if (!ret && GetLastError() == ERROR_BAD_LENGTH)
+	{
+		// calculate needed size before we free the too-small object
+		uint32_t objectSize = sizeof(PSAPI_WORKING_SET_BLOCK) * pwsi->NumberOfEntries + sizeof(pwsi->NumberOfEntries);
+		free(pwsi);
+		pwsi = (PPSAPI_WORKING_SET_INFORMATION)malloc(objectSize);
+		if (pwsi == nullptr)
+		{
+			return;
+		}
+		QueryWorkingSet(m_params.process, (PVOID)pwsi, objectSize);
+	}
+
+	for (int i = 0; i < pwsi->NumberOfEntries; ++i)
+	{
+		PSAPI_WORKING_SET_BLOCK block = pwsi->WorkingSetInfo[i];
+		if (pageRangeStart <= block.VirtualPage && block.VirtualPage <= pageRangeEnd)
+		{
+			if (FALSE == block.Shared)
+			{
+				// We're not using the shared version of this page, so someone else has locked it for writing
+				printf("Tamper detected in memory range %p - %p (Page VirtualAddress: %p, ShareCount: %d)\n", (void*)m_params.base_address, (void*)(m_params.base_address + m_params.size), (void*)(block.VirtualPage * 0x1000), (int)block.ShareCount);
+				attackDetected(0xB17E);
+				break;
+			}
+		}
+	}
+
+	if (pwsi != nullptr)
+	{
+		free(pwsi);
+		pwsi = nullptr;
+	}
 }
 
 void MemoryTamperScanner::printStartMessage()
