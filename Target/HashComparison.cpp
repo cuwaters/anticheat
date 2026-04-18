@@ -105,7 +105,10 @@ void HashComparer::compareHashes()
 
         BYTE* pHashBytes = NULL;
         DWORD hashSize = 0;
+
+        startDetectionTimer();
         hashSize = hashDataBuffer(&pHashBytes, pFileBytes, fileSize);
+        stopDetectionTimer();
 
         // if hashing failed, skip this file and check the next
         if (hashSize == 0)
@@ -116,6 +119,10 @@ void HashComparer::compareHashes()
         char hashString[65] = { 0 };
         bytesToHexString(pHashBytes, hashSize, hashString);
         int compare_result = strcmp(current.expectedHashValue, hashString);
+
+        std::string message ("Hashing ");
+        message.append(current.fileName);
+        printDurationMessage(std::move(message));
 
         if (compare_result != 0)
         {

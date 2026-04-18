@@ -82,6 +82,7 @@ void MemoryTamperScanner::threadedWork()
 		QueryWorkingSet(m_params.process, (PVOID)pwsi, objectSize);
 	}
 
+	startDetectionTimer();
 	for (int i = 0; i < pwsi->NumberOfEntries; ++i)
 	{
 		PSAPI_WORKING_SET_BLOCK block = pwsi->WorkingSetInfo[i];
@@ -96,12 +97,14 @@ void MemoryTamperScanner::threadedWork()
 			}
 		}
 	}
+	stopDetectionTimer();
 
 	if (pwsi != nullptr)
 	{
 		free(pwsi);
 		pwsi = nullptr;
 	}
+	printDurationMessage("Checking Memory ");
 }
 
 void MemoryTamperScanner::printStartMessage()

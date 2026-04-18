@@ -26,7 +26,8 @@ void ProcessScanner::threadedWork()
 	HANDLE hProcessSnapshot = INVALID_HANDLE_VALUE;
 	PROCESSENTRY32 pe32;
 	pe32.dwSize = sizeof(PROCESSENTRY32);
-	
+
+	startDetectionTimer();
 	// get a snapshot of running processes
 	hProcessSnapshot = CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 0);
 	if (hProcessSnapshot == INVALID_HANDLE_VALUE)
@@ -42,7 +43,7 @@ void ProcessScanner::threadedWork()
 		CloseHandle(hProcessSnapshot);
 		return;
 	}
-	
+
 	do
 	{
 		for (const wchar_t* susProcess : AttackingProcesses)
@@ -55,5 +56,8 @@ void ProcessScanner::threadedWork()
 		}
 	} while (Process32Next(hProcessSnapshot, &pe32));
 
+	stopDetectionTimer();
+
 	CloseHandle(hProcessSnapshot);
+	printDurationMessage("Scanning processes ");
 }

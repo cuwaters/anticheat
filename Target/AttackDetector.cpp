@@ -57,3 +57,10 @@ void AttackDetector::attackDetected(int attackCode)
 
     exit(attackCode);
 }
+
+void AttackDetector::printDurationMessage(std::string prependStr)
+{
+    using namespace std::chrono;
+    microseconds duration = duration_cast<microseconds>(m_EndTime - m_StartTime);
+    std::cout << prependStr << " took " << duration.count() << " microseconds." << std::endl;
+}
